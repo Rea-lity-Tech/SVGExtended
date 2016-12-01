@@ -15,4 +15,4 @@ PShape shape = new PShapeSVGExtended(imageXML);
 
 ## How to install ? 
 
-The library already compiled, see the [realease page](https://github.com/poqudrof/SVGExtended/releases).
+The library already compiled, see the [release page](https://github.com/poqudrof/SVGExtended/releases).
