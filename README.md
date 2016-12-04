@@ -1,6 +1,6 @@
 # SVGExtended
 
-Processing library to extend the support of SVGs, for now there is image and text that is added. 
+Processing library to extend the support of SVGs: image and text support.
 
 It is developped for [Soby](https://github.com/poqudrof/Soby), and [PapARt](https://github.com/poqudrof/PapARt). 
 
