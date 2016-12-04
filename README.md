@@ -4,6 +4,8 @@ Processing library to extend the support of SVGs, for now there is image and tex
 
 It is developped for [Soby](https://github.com/poqudrof/Soby), and [PapARt](https://github.com/poqudrof/PapARt). 
 
+Project page by RealityTech: https://rea.lity.tech/SVGExtended
+
 ## How to use ? 
 
 Instead of creating a PShapeSVG from an XML, use a PShapeSVGExtended. 
