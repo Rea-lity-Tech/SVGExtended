@@ -41,7 +41,6 @@ public class PShapeExtended extends PShape {
 
     
   /**
-   * @nowebref
    */
   public PShapeExtended() {
     this.family = GROUP;
@@ -49,7 +48,6 @@ public class PShapeExtended extends PShape {
 
 
   /**
-   * @nowebref
    */
   public PShapeExtended(int family) {
     this.family = family;
@@ -57,7 +55,6 @@ public class PShapeExtended extends PShape {
 
 
   /**
-   * @nowebref
    */
   public PShapeExtended(PGraphics g, int family) {
     this.g = g;
