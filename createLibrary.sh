@@ -25,6 +25,9 @@ cp -R test $TMP/$NAME/
 echo "Copy the JavaDoc" 
 cp -R target/site/apidocs $TMP/$NAME/
 
+echo "Copy the Examples" 
+cp -R examples/* $TMP/$NAME/examples/
+
 echo "Create the archive..." 
 cd $TMP
 
