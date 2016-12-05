@@ -1690,17 +1690,17 @@ public class PShapeSVGExtended extends PShapeExtended {
     public Text(PShapeSVGExtended parent, XML properties) {
       super(parent, properties, true);
 
-            // get location
-      float x = Float.parseFloat(properties.getString("x"));
-      float y = Float.parseFloat(properties.getString("y"));
-
-      if (matrix == null) {
-        matrix = new PMatrix2D();
+      if(properties.hasAttribute("x") && properties.hasAttribute("y")){
+        // get location
+        float x = Float.parseFloat(properties.getString("x"));
+        float y = Float.parseFloat(properties.getString("y"));
+        if (matrix == null) {
+          matrix = new PMatrix2D();
+        }
+        matrix.translate(x, y);
       }
-      matrix.translate(x, y);
-
+      
       family = GROUP;
-
       font = parseFont(properties);
 
     }
@@ -1722,12 +1722,27 @@ public class PShapeSVGExtended extends PShapeExtended {
       super(parent, properties, false);
 
 //    // get location
-      float x = Float.parseFloat(properties.getString("x"));
-      float y = Float.parseFloat(properties.getString("y"));
 
-      float parentX = Float.parseFloat(parent.element.getString("x"));
-      float parentY = Float.parseFloat(parent.element.getString("y"));
-       
+      float x = 0; 
+      float y = 0;
+
+      float parentX = 0;
+      float parentY = 0;
+
+      try{ x = Float.parseFloat(properties.getString("x")); }
+      catch(NumberFormatException e){}
+      try{ y = Float.parseFloat(properties.getString("y")); }
+      catch(NumberFormatException e){}
+
+      // TODO: when/why  does this happen ?
+      if(parent != null && parent.element != null && 
+         parent.element.hasAttribute("x")&& parent.element.hasAttribute("y")) {
+      try{ parentX = Float.parseFloat(parent.element.getString("x")); }
+      catch(NumberFormatException e){}
+      try{ parentY = Float.parseFloat(parent.element.getString("y")); }
+      catch(NumberFormatException e){}
+      }
+      
       if (matrix == null) matrix = new PMatrix2D();
       matrix.translate(x - parentX, (y - parentY) / 2f);
      
