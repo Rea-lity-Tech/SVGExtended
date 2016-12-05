@@ -11,8 +11,24 @@ Project page by RealityTech: https://rea.lity.tech/SVGExtended
 Instead of creating a PShapeSVG from an XML, use a PShapeSVGExtended. 
 
 ``` java
-XML imageXML = loadXML("image.svg");
-PShape shape = new PShapeSVGExtended(imageXML);
+import tech.lity.rea.svgextended.*;
+
+PShape bot1, bot2;
+void setup() {
+  size(640, 660);
+  // The file "bot1.svg" must be in the data folder
+  // of the current sketch to load successfully
+  bot1 = loadShape("bot2.svg");
+
+  // The file "bot2.svg" must be located with "bot1.svg"
+  bot2 = new PShapeSVGExtended(loadXML("bot2.svg"));
+} 
+
+void draw(){
+  background(102);
+  shape(bot1, 0, 0); 
+  shape(bot2, 0, 320);
+}
 ```
 
 ## How to install ? 
