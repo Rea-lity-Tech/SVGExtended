@@ -115,8 +115,8 @@ public class PShapeSVGExtended extends PShapeExtended {
 
   protected Gradient fillGradient;
   String fillName;  // id of another object
-  
-  
+
+
   /**
    * Initializes a new SVG object from the given XML object.
    */
@@ -337,7 +337,7 @@ public class PShapeSVGExtended extends PShapeExtended {
     } else if (name.equals("rect")) {
       shape = createShape(this, elem, true);
       shape.parseRect();
-   
+
     } else if (name.equals("image")) {
       shape = createShape(this, elem, true);
       shape.parseImage();
@@ -371,8 +371,8 @@ public class PShapeSVGExtended extends PShapeExtended {
 
     } else if (name.equals("text")) {  // || name.equals("font")) {
         return new Text(this, elem);
-    
-    } else if (name.equals("tspan")) { 
+
+    } else if (name.equals("tspan")) {
         return new LineOfText(this, elem);
 
     } else if (name.equals("filter")) {
@@ -453,8 +453,8 @@ public class PShapeSVGExtended extends PShapeExtended {
       getFloatWithUnit(element, "height", svgHeight)
     };
   }
-  
-  
+
+
   protected void parseImage() {
     kind = RECT;
     textureMode = NORMAL;
@@ -469,7 +469,7 @@ public class PShapeSVGExtended extends PShapeExtended {
 
     this.imagePath = element.getString("xlink:href");
   }
-  
+
   /**
    * Parse a polyline or polygon from an SVG file.
    * Syntax defined at http://www.w3.org/TR/SVG/shapes.html#PointsBNF
@@ -1586,16 +1586,17 @@ public class PShapeSVGExtended extends PShapeExtended {
 
 
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-  
+
   public static float TEXT_QUALITY = 1;
-  protected PFont parseFont(XML properties) {
+  protected FontStyle parseFont(XML properties) {
 
 //        FontFace fontFace = new FontFace(this, properties);
     String fontFamily = null;
-    float size = 10;
+    float size = -1;
     int weight = PLAIN; // 0
     int italic = 0;
-    
+    float lineHeight = 100; // %
+
     if (properties.hasAttribute("style")) {
       String styleText = properties.getString("style");
       String[] styleTokens = PApplet.splitTokens(styleText, ";");
@@ -1619,12 +1620,10 @@ public class PShapeSVGExtended extends PShapeExtended {
 
         } else if (tokens[0].equals("font-weight")) {
             // PApplet.println("font-weight: " + tokens[1]);
-                
             if (tokens[1].contains("bold")) {
               weight = BOLD;
               // PApplet.println("Bold weight ! ");
             }
-    
 
         } else if (tokens[0].equals("font-stretch")) {
           // not supported.
@@ -1635,9 +1634,9 @@ public class PShapeSVGExtended extends PShapeExtended {
           // PApplet.println("font-size-parsed: " + size);
         } else if (tokens[0].equals("line-height")) {
                 // not supported
+          lineHeight = Float.parseFloat(tokens[1].split("%")[0]);
 
         } else if (tokens[0].equals("font-family")) {
-           PApplet.println("Font-family: " + tokens[1]);
           fontFamily = tokens[1];
           if(fontFamily.contains("'")){
             fontFamily = fontFamily.replace("'", "");
@@ -1663,30 +1662,94 @@ public class PShapeSVGExtended extends PShapeExtended {
         }
       }
     }
-    if (fontFamily == null) {
-      return null;
-    }
-    size = size * TEXT_QUALITY;
 
-    return createFont(fontFamily, weight | italic, size, true);
+    boolean smooth = true;
+
+    FontStyle fs = new FontStyle();
+    fs.name = fontFamily;
+    fs.weight = weight;
+    fs.size = size;
+    fs.smooth = smooth;
+    fs.lineHeight = lineHeight;
+    return fs;
+    // if (fontFamily == null) {
+    //   return null;
+    // }
+    // size = size * TEXT_QUALITY;
+
+    // return createFont(fontFamily, weight | italic, size, true);
   }
 
-  protected PFont createFont(String name, int weight, float size, boolean smooth) {
+  class FontStyle{
+    public String name;
+    public int weight;
+    public float size;
+    public boolean smooth;
+    public float lineHeight = 100; // %
 
-//    System.out.println("Try to create a font of " + name + " family, " + weight);
-    java.awt.Font baseFont = new java.awt.Font(name, weight, (int) size); // PFont.findFont(name);ç
+    public FontStyle(){}
 
-//    System.out.println("Resulting family : " + baseFont.getFamily() + " " + baseFont.getStyle());
-    PFont outputPFont = new PFont(baseFont.deriveFont(size), smooth, null);
+    public boolean isInvalid(){
+      return name == null || name.equals("") || size <= 0;
+    }
+    @Override
+    public boolean equals(Object obj){
 
-//    System.out.println("Resulting PFont family : " + outputPFont.getName());
+      if (obj == null) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
+        return false;
+      }
+      FontStyle other = (FontStyle) obj;
+      return name.equals(other.name) && weight == other.weight &&
+        size == other.size && smooth == other.smooth;
+    }
+
+    @Override public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((name == null) ? 0 : name.hashCode());
+      result = prime * result + weight;
+      result = prime * result + (int)size;
+      result = prime * result + (int) lineHeight;
+      result = prime * result + (smooth ? 0 : 1);
+      return result;
+    }
+    ///    Read more: http://javarevisited.blogspot.com/2011/02/how-to-write-equals-method-in-java.html#ixzz4UWbrHLQw
+  }
+
+  static HashMap<FontStyle, PFont> fontMap = new HashMap();
+
+
+  protected PFont getFont(FontStyle fs){
+
+    PFont existing = fontMap.get(fs);
+    if(existing != null){
+      return existing;
+    }
+
+    // WARNING avoid this before if possible
+    if(fs.isInvalid()){
+      return null;
+    }
+
+    // System.out.println("Try to create a font of " + name + " family, " + weight + " "  + size);
+    java.awt.Font baseFont = new java.awt.Font(fs.name, fs.weight, (int) fs.size); // PFont.findFont(name);
+
+    // System.out.println("Resulting family : " + baseFont.getFamily() + " " + baseFont.getStyle());
+    PFont outputPFont = new PFont(baseFont.deriveFont(fs.size), fs.smooth, null);
+
+    fontMap.put(fs, outputPFont);
+
+    // System.out.println("Resulting PFont family : " + outputPFont.getName());
     return outputPFont;
   }
 
   public static class Text extends PShapeSVGExtended {
 
     protected PFont font;
-
+    protected FontStyle fs;
     public Text(PShapeSVGExtended parent, XML properties) {
       super(parent, properties, true);
 
@@ -1699,31 +1762,53 @@ public class PShapeSVGExtended extends PShapeExtended {
         }
         matrix.translate(x, y);
       }
-      
-      family = GROUP;
-      font = parseFont(properties);
 
+      family = GROUP;
+
+      fs = parseFont(properties);
+
+      if(fs.isInvalid()){
+        // text nested inside text ? Valid or possible ?
+        // PFont parentFont = ((Text) parent).font;
+        // if (parentFont == null) {
+        //   font = null;
+        //   return;
+        // } else {
+        //   font = parentFont;
+        // }
+      } else {
+        font = getFont(fs);
+        if(fs.lineHeight != 100){
+          matrix.scale(1, (fs.lineHeight / 100f));
+        }
+      }
     }
 
-//        @Override
-//        public void drawImpl(PGraphics g){
-//        }
+       @Override
+       public void drawImpl(PGraphics g){
+         if(font != null){
+           g.textFont(font, font.getSize());
+         }
+         drawGroup(g);
+       }
   }
 
   public static class LineOfText extends PShapeSVGExtended {
 
     String textToDisplay;
     PFont font;
+    float size = -1;
+    FontStyle fs;
 
     public LineOfText(PShapeSVGExtended parent, XML properties) {
 
-    // TODO: child should ideally be parsed too... 
-    // for inline content. 
+    // TODO: child should ideally be parsed too...
+    // for inline content.
       super(parent, properties, false);
 
 //    // get location
 
-      float x = 0; 
+      float x = 0;
       float y = 0;
 
       float parentX = 0;
@@ -1735,22 +1820,30 @@ public class PShapeSVGExtended extends PShapeExtended {
       catch(NumberFormatException e){}
 
       // TODO: when/why  does this happen ?
-      if(parent != null && parent.element != null && 
+      if(parent != null && parent.element != null &&
          parent.element.hasAttribute("x")&& parent.element.hasAttribute("y")) {
       try{ parentX = Float.parseFloat(parent.element.getString("x")); }
       catch(NumberFormatException e){}
       try{ parentY = Float.parseFloat(parent.element.getString("y")); }
       catch(NumberFormatException e){}
       }
-      
+
       if (matrix == null) matrix = new PMatrix2D();
       matrix.translate(x - parentX, (y - parentY) / 2f);
-     
-    // get the first properties
-     parseColors(properties);
-      font = parseFont(properties);
 
-      // It is a line.. 
+    // get the first properties
+      parseColors(properties);
+
+      fs = parseFont(properties);
+
+      if(fs.isInvalid() && fs.size > 0){
+        this.size = fs.size;
+
+      } else {
+        font = getFont(fs);
+      }
+
+      // It is a line..
       boolean isALine = properties.getString("role") == "line";
       // NO inline content yet.
       if (this.childCount > 0) {
@@ -1758,25 +1851,29 @@ public class PShapeSVGExtended extends PShapeExtended {
 
       String text = properties.getContent();
       textToDisplay = text;
+
+      // Does not matter...
+      family = GROUP;
     }
 
     @Override
     public void drawImpl(PGraphics g) {
-      if (font == null) {
-        font = ((Text) parent).font;
-        if (font == null) {
-          return;
-        }
+
+      //      g.textFont(font);
+      //      g.textFont(font, font.getSize() / TEXT_QUALITY);
+      if(size > 0)
+        g.textSize(size);
+
+      float parentScale = ((Text) parent).fs.lineHeight;
+      if(parentScale != 100f){
+        g.scale(1, 2 - parentScale/100f);
       }
 
-      pre(g);
-      g.textFont(font, font.getSize() / TEXT_QUALITY);
       g.text(textToDisplay, 0, 0);
-      post(g);
     }
 
   }
-  
+
   public static class Font extends PShapeSVGExtended {
     public FontFace face;
 
@@ -1994,7 +2091,7 @@ public class PShapeSVGExtended extends PShapeExtended {
     }
     return found;
   }
-  
+
   public PMatrix getMatrix(){
     return this.matrix;
   }

@@ -39,7 +39,7 @@ public class PShapeExtended extends PShape {
     PGraphics g;
     protected String imagePath;
 
-    
+
   /**
    */
   public PShapeExtended() {
@@ -219,7 +219,7 @@ public class PShapeExtended extends PShape {
       }
       this.imagePath = null;
   }
-  
+
   private void loadFileSystemImage(PGraphics g){
     imagePath = imagePath.substring(7);
     PImage loadedImage = g.parent.loadImage(imagePath);
@@ -241,7 +241,7 @@ public class PShapeExtended extends PShape {
       System.err.println("Decode Error on image: " + imagePath.substring(0, 20));
       return;
     }
-    
+
     Image awtImage = new ImageIcon(decodedBytes).getImage();
 
     if (awtImage instanceof BufferedImage) {
@@ -262,10 +262,10 @@ public class PShapeExtended extends PShape {
       extension.equals("unknown")) {
       checkAlpha(loadedImage);
     }
-    
+
     setTexture(loadedImage);
   }
- 
+
  // HACK: to access the checkAlpha method.
   private void checkAlpha(PImage img) {
     if (img.pixels == null) return;
