@@ -1588,15 +1588,12 @@ public class PShapeSVGExtended extends PShapeExtended {
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
   public static float TEXT_QUALITY = 1;
+
   protected FontStyle parseFont(XML properties) {
+    return updateFontStyle(properties, new FontStyle());
+  }
 
-//        FontFace fontFace = new FontFace(this, properties);
-    String fontFamily = null;
-    float size = -1;
-    int weight = PLAIN; // 0
-    int italic = 0;
-    float lineHeight = 100; // %
-
+  protected FontStyle updateFontStyle(XML properties, FontStyle fs){
     if (properties.hasAttribute("style")) {
       String styleText = properties.getString("style");
       String[] styleTokens = PApplet.splitTokens(styleText, ";");
@@ -1612,7 +1609,7 @@ public class PShapeSVGExtended extends PShapeExtended {
         if (tokens[0].equals("font-style")) {
           // PApplet.println("font-style: " + tokens[1]);
           if (tokens[1].contains("italic")) {
-            italic = ITALIC;
+            fs.italic = ITALIC;
           }
         } else if (tokens[0].equals("font-variant")) {
           // PApplet.println("font-variant: " + tokens[1]);
@@ -1621,7 +1618,7 @@ public class PShapeSVGExtended extends PShapeExtended {
         } else if (tokens[0].equals("font-weight")) {
             // PApplet.println("font-weight: " + tokens[1]);
             if (tokens[1].contains("bold")) {
-              weight = BOLD;
+              fs.weight = BOLD;
               // PApplet.println("Bold weight ! ");
             }
 
@@ -1630,18 +1627,18 @@ public class PShapeSVGExtended extends PShapeExtended {
 
         } else if (tokens[0].equals("font-size")) {
           // PApplet.println("font-size: " + tokens[1]);
-          size = Float.parseFloat(tokens[1].split("px")[0]);
+          fs.size = Float.parseFloat(tokens[1].split("px")[0]);
           // PApplet.println("font-size-parsed: " + size);
         } else if (tokens[0].equals("line-height")) {
                 // not supported
-          lineHeight = Float.parseFloat(tokens[1].split("%")[0]);
+          fs.lineHeight = Float.parseFloat(tokens[1].split("%")[0]);
 
         } else if (tokens[0].equals("font-family")) {
-          fontFamily = tokens[1];
+          String fontFamily = tokens[1];
           if(fontFamily.contains("'")){
             fontFamily = fontFamily.replace("'", "");
           }
-
+          fs.name = fontFamily;
         } else if (tokens[0].equals("text-align")) {
           // not supported
 
@@ -1662,32 +1659,30 @@ public class PShapeSVGExtended extends PShapeExtended {
         }
       }
     }
-
-    boolean smooth = true;
-
-    FontStyle fs = new FontStyle();
-    fs.name = fontFamily;
-    fs.weight = weight;
-    fs.size = size;
-    fs.smooth = smooth;
-    fs.lineHeight = lineHeight;
+    fs.smooth = true;
     return fs;
-    // if (fontFamily == null) {
-    //   return null;
-    // }
-    // size = size * TEXT_QUALITY;
-
-    // return createFont(fontFamily, weight | italic, size, true);
   }
+
 
   class FontStyle{
     public String name;
     public int weight;
+    public int italic = 0;
     public float size;
     public boolean smooth;
     public float lineHeight = 100; // %
 
     public FontStyle(){}
+    public FontStyle copy(){
+      FontStyle fs = new FontStyle();
+      fs.name = this.name;
+      fs.weight = this.weight;
+      fs.italic = this.italic;
+      fs.size = this.size;
+      fs.smooth = this.smooth;
+      fs.lineHeight = this.lineHeight;
+      return fs;
+    }
 
     public boolean isInvalid(){
       return name == null || name.equals("") || size <= 0;
@@ -1712,6 +1707,7 @@ public class PShapeSVGExtended extends PShapeExtended {
       result = prime * result + ((name == null) ? 0 : name.hashCode());
       result = prime * result + weight;
       result = prime * result + (int)size;
+      result = prime * result + (int)italic;
       result = prime * result + (int) lineHeight;
       result = prime * result + (smooth ? 0 : 1);
       return result;
@@ -1720,7 +1716,6 @@ public class PShapeSVGExtended extends PShapeExtended {
   }
 
   static HashMap<FontStyle, PFont> fontMap = new HashMap();
-
 
   protected PFont getFont(FontStyle fs){
 
@@ -1748,10 +1743,11 @@ public class PShapeSVGExtended extends PShapeExtended {
 
   public static class Text extends PShapeSVGExtended {
 
-    protected PFont font;
     protected FontStyle fs;
     public Text(PShapeSVGExtended parent, XML properties) {
-      super(parent, properties, true);
+      super(parent, properties, false);
+      // false is for parseKids(), called after this
+
 
       if(properties.hasAttribute("x") && properties.hasAttribute("y")){
         // get location
@@ -1764,33 +1760,20 @@ public class PShapeSVGExtended extends PShapeExtended {
       }
 
       family = GROUP;
-
       fs = parseFont(properties);
-
-      if(fs.isInvalid()){
-        // text nested inside text ? Valid or possible ?
-        // PFont parentFont = ((Text) parent).font;
-        // if (parentFont == null) {
-        //   font = null;
-        //   return;
-        // } else {
-        //   font = parentFont;
-        // }
-      } else {
-        font = getFont(fs);
-        if(fs.lineHeight != 100){
-          matrix.scale(1, (fs.lineHeight / 100f));
-        }
+      // System.out.println("Parsed family" +fs.family);
+      if(fs.lineHeight != 100){
+        matrix.scale(1, (fs.lineHeight / 100f));
       }
+
+      parseColors(properties);
+      parseChildren(properties);
     }
 
-       @Override
-       public void drawImpl(PGraphics g){
-         if(font != null){
-           g.textFont(font, font.getSize());
-         }
-         drawGroup(g);
-       }
+    @Override
+    public void drawImpl(PGraphics g){
+      drawGroup(g);
+    }
   }
 
   public static class LineOfText extends PShapeSVGExtended {
@@ -1834,14 +1817,17 @@ public class PShapeSVGExtended extends PShapeExtended {
     // get the first properties
       parseColors(properties);
 
-      fs = parseFont(properties);
-
-      if(fs.isInvalid() && fs.size > 0){
-        this.size = fs.size;
-
+      FontStyle parentStyle = ((Text) parent).fs;
+      if(parentStyle != null){
+        fs = parentStyle.copy();
       } else {
-        font = getFont(fs);
+        System.out.println("Parent style null !");
+        fs = new FontStyle();
       }
+
+      // copy the parent and update it with this style.
+      fs = updateFontStyle(properties, fs);
+      font = getFont(fs);
 
       // It is a line..
       boolean isALine = properties.getString("role") == "line";
@@ -1852,6 +1838,11 @@ public class PShapeSVGExtended extends PShapeExtended {
       String text = properties.getContent();
       textToDisplay = text;
 
+      if(font == null){
+        System.out.println("Null font for " + textToDisplay);
+      }
+
+
       // Does not matter...
       family = GROUP;
     }
@@ -1861,13 +1852,14 @@ public class PShapeSVGExtended extends PShapeExtended {
 
       //      g.textFont(font);
       //      g.textFont(font, font.getSize() / TEXT_QUALITY);
-      if(size > 0)
-        g.textSize(size);
-
+      // if(size > 0)
+      //   g.textSize(size);
       float parentScale = ((Text) parent).fs.lineHeight;
       if(parentScale != 100f){
         g.scale(1, 2 - parentScale/100f);
       }
+
+      g.textFont(font, font.getSize());
 
       g.text(textToDisplay, 0, 0);
     }
