@@ -1587,7 +1587,7 @@ public class PShapeSVGExtended extends PShapeExtended {
 
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  public static float TEXT_QUALITY = 1;
+  public static float TEXT_QUALITY = 3;
 
   protected FontStyle parseFont(XML properties) {
     return updateFontStyle(properties, new FontStyle());
@@ -1628,6 +1628,7 @@ public class PShapeSVGExtended extends PShapeExtended {
         } else if (tokens[0].equals("font-size")) {
           // PApplet.println("font-size: " + tokens[1]);
           fs.size = Float.parseFloat(tokens[1].split("px")[0]);
+          fs.size = fs.size * TEXT_QUALITY;
           // PApplet.println("font-size-parsed: " + size);
         } else if (tokens[0].equals("line-height")) {
                 // not supported
@@ -1749,6 +1750,7 @@ public class PShapeSVGExtended extends PShapeExtended {
       // false is for parseKids(), called after this
 
 
+      // Useless ?!
       if(properties.hasAttribute("x") && properties.hasAttribute("y")){
         // get location
         float x = Float.parseFloat(properties.getString("x"));
@@ -1756,15 +1758,15 @@ public class PShapeSVGExtended extends PShapeExtended {
         if (matrix == null) {
           matrix = new PMatrix2D();
         }
-        matrix.translate(x, y);
+        // matrix.translate(x, y);
       }
 
       family = GROUP;
       fs = parseFont(properties);
       // System.out.println("Parsed family" +fs.family);
-      if(fs.lineHeight != 100){
-        matrix.scale(1, (fs.lineHeight / 100f));
-      }
+      // if(fs.lineHeight != 100){
+      //   matrix.scale(1, (fs.lineHeight / 100f));
+      // }
 
       parseColors(properties);
       parseChildren(properties);
@@ -1802,28 +1804,15 @@ public class PShapeSVGExtended extends PShapeExtended {
       try{ y = Float.parseFloat(properties.getString("y")); }
       catch(NumberFormatException e){}
 
-      // TODO: when/why  does this happen ?
-      if(parent != null && parent.element != null &&
-         parent.element.hasAttribute("x")&& parent.element.hasAttribute("y")) {
-      try{ parentX = Float.parseFloat(parent.element.getString("x")); }
-      catch(NumberFormatException e){}
-      try{ parentY = Float.parseFloat(parent.element.getString("y")); }
-      catch(NumberFormatException e){}
-      }
-
       if (matrix == null) matrix = new PMatrix2D();
-      matrix.translate(x - parentX, (y - parentY) / 2f);
+      //      matrix.translate(x - parentX, (y - parentY) / 2f);
+      matrix.translate(x, y);
 
     // get the first properties
       parseColors(properties);
 
       FontStyle parentStyle = ((Text) parent).fs;
-      if(parentStyle != null){
-        fs = parentStyle.copy();
-      } else {
-        System.out.println("Parent style null !");
-        fs = new FontStyle();
-      }
+      fs = parentStyle.copy();
 
       // copy the parent and update it with this style.
       fs = updateFontStyle(properties, fs);
@@ -1838,11 +1827,6 @@ public class PShapeSVGExtended extends PShapeExtended {
       String text = properties.getContent();
       textToDisplay = text;
 
-      if(font == null){
-        System.out.println("Null font for " + textToDisplay);
-      }
-
-
       // Does not matter...
       family = GROUP;
     }
@@ -1854,13 +1838,12 @@ public class PShapeSVGExtended extends PShapeExtended {
       //      g.textFont(font, font.getSize() / TEXT_QUALITY);
       // if(size > 0)
       //   g.textSize(size);
-      float parentScale = ((Text) parent).fs.lineHeight;
-      if(parentScale != 100f){
-        g.scale(1, 2 - parentScale/100f);
-      }
+      // float parentScale = ((Text) parent).fs.lineHeight;
+      // if(parentScale != 100f){
+      //   g.scale(1, 2 - parentScale/100f);
+      // }
 
-      g.textFont(font, font.getSize());
-
+      g.textFont(font, font.getSize() / TEXT_QUALITY);
       g.text(textToDisplay, 0, 0);
     }
 
