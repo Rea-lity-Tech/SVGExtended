@@ -76,8 +76,6 @@ import processing.core.PMatrix2D;
  * <A HREF="http://www.w3.org/TR/SVGMobile/">SVG Tiny or Basic</A>,
  * although we still would not support the interactivity options.
  *
- * <p> <hr noshade> <p>
- *
  * A minimal example program using SVG:
  * (assuming a working moo.svg is in your data folder)
  *
