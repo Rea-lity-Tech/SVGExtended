@@ -3,6 +3,7 @@
 /*
   Part of the Processing project - http://processing.org
 
+  Copyright (c) 2016-2017 RealityTech SASU
   Copyright (c) 2006-10 Ben Fry and Casey Reas
 
   This library is free software; you can redistribute it and/or

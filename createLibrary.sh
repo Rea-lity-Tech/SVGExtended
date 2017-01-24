@@ -4,6 +4,7 @@ SKETCHBOOK=sketches
 TMP=tmp
 NAME=SVGExtended
 
+VERSION=3.2.1
 
 mkdir $TMP
 mkdir $TMP/$NAME 
@@ -13,7 +14,7 @@ mkdir $TMP/$NAME/examples
 
 echo "Copy Library"
 # Library
-cp target/$NAME-*.jar $TMP/$NAME/library/$NAME.jar
+cp target/$NAME-$VERSION.jar $TMP/$NAME/library/$NAME.jar
 
 
 echo "Copy the sources" 

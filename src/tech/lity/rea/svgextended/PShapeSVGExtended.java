@@ -3,6 +3,7 @@
 /*
   Part of the Processing project - http://processing.org
 
+  Copyright (c) 2016-2017 RealityTech SASU
   Copyright (c) 2012-15 The Processing Foundation
   Copyright (c) 2006-12 Ben Fry and Casey Reas
   Copyright (c) 2004-06 Michael Chang
@@ -1730,16 +1731,25 @@ public class PShapeSVGExtended extends PShapeExtended {
       return null;
     }
 
-    // System.out.println("Try to create a font of " + name + " family, " + weight + " "  + size);
-    java.awt.Font baseFont = new java.awt.Font(fs.name, fs.weight, (int) fs.size); // PFont.findFont(name);
+    try{ 
+        // System.out.println("Try to create a font of " + name + " family, " + weight + " "  + size);
+        java.awt.Font baseFont = new java.awt.Font(fs.name, fs.weight, (int) fs.size); // PFont.findFont(name);
 
-    // System.out.println("Resulting family : " + baseFont.getFamily() + " " + baseFont.getStyle());
-    PFont outputPFont = new PFont(baseFont.deriveFont(fs.size), fs.smooth, null);
+        // System.out.println("Resulting family : " + baseFont.getFamily() + " " + baseFont.getStyle());
+        PFont outputPFont = new PFont(baseFont.deriveFont(fs.size), fs.smooth, null);
 
-    fontMap.put(fs, outputPFont);
+        fontMap.put(fs, outputPFont);
 
-    // System.out.println("Resulting PFont family : " + outputPFont.getName());
-    return outputPFont;
+        // System.out.println("Resulting PFont family : " + outputPFont.getName());
+        return outputPFont;
+  } 
+    catch(java.lang.NoClassDefFoundError e){
+        // Font not found 
+        return null;
+    }
+    catch(Exception e){
+        return null;
+    }
   }
 
   public static class Text extends PShapeSVGExtended {
@@ -1843,7 +1853,9 @@ public class PShapeSVGExtended extends PShapeExtended {
       //   g.scale(1, 2 - parentScale/100f);
       // }
 
+      if(font != null){
       g.textFont(font, font.getSize() / TEXT_QUALITY);
+      }
       g.text(textToDisplay, 0, 0);
     }
 
