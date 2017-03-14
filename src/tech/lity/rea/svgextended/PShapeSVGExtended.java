@@ -1631,8 +1631,9 @@ public class PShapeSVGExtended extends PShapeExtended {
           // PApplet.println("font-size-parsed: " + size);
         } else if (tokens[0].equals("line-height")) {
                 // not supported
-          fs.lineHeight = Float.parseFloat(tokens[1].split("%")[0]);
+                fs.lineHeight = tokens[1];
 
+                // Can be px or  % 
         } else if (tokens[0].equals("font-family")) {
           String fontFamily = tokens[1];
           if(fontFamily.contains("'")){
@@ -1670,8 +1671,8 @@ public class PShapeSVGExtended extends PShapeExtended {
     public int italic = 0;
     public float size;
     public boolean smooth;
-    public float lineHeight = 100; // %
-
+    public String lineHeight = ""; // %
+    
     public FontStyle(){}
     public FontStyle copy(){
       FontStyle fs = new FontStyle();
@@ -1708,7 +1709,7 @@ public class PShapeSVGExtended extends PShapeExtended {
       result = prime * result + weight;
       result = prime * result + (int)size;
       result = prime * result + (int)italic;
-      result = prime * result + (int) lineHeight;
+      result = prime * result + lineHeight.hashCode();
       result = prime * result + (smooth ? 0 : 1);
       return result;
     }
