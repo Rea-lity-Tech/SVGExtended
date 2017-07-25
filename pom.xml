@@ -3,7 +3,7 @@
     <groupId>tech.lity.rea</groupId>
     <artifactId>SVGExtended</artifactId>
 
-    <version>3.2.3</version>
+    <version>3.3.4</version>
     <packaging>jar</packaging>
 
     <name>SVGExtended</name>
@@ -53,7 +53,7 @@
         <dependency>
             <groupId>org.processing</groupId>
             <artifactId>core</artifactId>
-            <version>3.2.3</version>
+            <version>3.3.5</version>
         </dependency>
 
         <dependency>
