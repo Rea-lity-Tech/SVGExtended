@@ -1,0 +1,14 @@
+events:
+  - image: "/img/timeline/spidertocat.png"
+    date: "February 2016"
+    description: "Beginning of the start-up!"
+    date_fr: "Février 2016"
+    description_fr: "Le début de la start-up!"
+  - image: "/img/timeline/baracktocat.jpg"
+    date: "Early 2011 to 2014"
+    description: "Research project at Inria and Bordeaux University."
+    date_fr: "Début 2011 à 2014"
+    description_fr: "Projet de recherche à Inria et l'Université de Bordeaux."
+
+
+img: "/img/timeline/default.png"

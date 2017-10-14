@@ -1,0 +1,36 @@
+---
+layout: index
+section-type: index
+---
+
+<section id="main" class="container content-section ">
+  
+  <div class="row">
+    <div class="col-md-4 ">
+      <p>
+	<b>Text support</b>: it is possible to display text from svg images. .
+	</p>
+    </div>
+    <div class="col-md-4 ">
+      <p>
+	<b>Embedded and linked images</b>: svg files can contain rasterized images (jpeg, png), they are displayed now. 
+	</p>
+    </div>
+    <div class="col-md-4 ">
+      <p>
+	<b>Simple extension</b>: this library is a simple extension of the PShapeSVG class from vanilla Processing. 
+      </p>
+    </div>
+  </div>
+</section>
+
+{% include section_start.html %}
+      
+{% capture readme %}
+{% include_relative README.md %}
+{% endcapture %}
+{{ readme | markdownify }}
+
+{% include section_end.html %}
+
+
