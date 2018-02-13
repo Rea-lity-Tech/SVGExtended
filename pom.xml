@@ -3,13 +3,13 @@
     <groupId>tech.lity.rea</groupId>
     <artifactId>SVGExtended</artifactId>
 
-    <version>3.3.4</version>
+    <version>3.3.6</version>
     <packaging>jar</packaging>
 
     <name>SVGExtended</name>
     <description>Exstenion of SVG support for Processing</description>
     <url>https://github.com/poqudrof/SVGExtended</url>
-
+   
     <licenses>
         <license>
             <name> GNU Lesser General Public License version 2 (LGPLv2)</name>
@@ -17,6 +17,13 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+    
+    <distributionManagement>
+        <repository>
+            <id>ftp-repository</id>
+            <url>ftp://ftp.cluster020.hosting.ovh.net/www/repository</url>
+        </repository>
+    </distributionManagement>   
 
     <repositories>
         <repository>
@@ -38,22 +45,12 @@
         <developerConnection>scm:git:git@github.com:poqudrof/SVGExtended</developerConnection>
     </scm>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-
+  
     <dependencies>
         <dependency>
             <groupId>org.processing</groupId>
             <artifactId>core</artifactId>
-            <version>3.3.5</version>
+            <version>3.3.6</version>
         </dependency>
 
         <dependency>
@@ -67,6 +64,15 @@
     <build>
         <sourceDirectory>src</sourceDirectory>
         <testSourceDirectory>test</testSourceDirectory>
+           <extensions>
+            <!-- Enabling the use of FTP -->
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ftp</artifactId>
+                <version>3.0.0</version>
+            </extension>
+        </extensions>
+        
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
