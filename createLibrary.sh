@@ -4,7 +4,7 @@ SKETCHBOOK=sketches
 TMP=tmp
 NAME=SVGExtended
 
-VERSION=3.2.1
+VERSION=3.3.5
 
 mkdir $TMP
 mkdir $TMP/$NAME 
