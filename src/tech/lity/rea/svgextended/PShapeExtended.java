@@ -108,6 +108,23 @@ public class PShapeExtended extends PShape {
             // TODO why was this commented out?
         }
     }
+    
+    public void setStroke(boolean isIt, int stroke){
+        this.stroke = isIt;
+        this.strokeColor = stroke;
+    }
+    public int getStroke(){
+        return this.strokeColor;
+    }
+    public int getFill(){
+        return this.fillColor;
+    }
+    public float getStrokeWeight(){
+        return this.strokeWeight;
+    }
+    public boolean isStroke(){
+        return this.stroke;
+    }
 
     public PShapeExtended(PGraphics g, int kind, float... params) {
         this(g, PRIMITIVE);
